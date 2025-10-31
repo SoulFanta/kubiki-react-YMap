@@ -128,6 +128,7 @@ function App() {
                 MapMarker={YMapMarker}
                 category={item.category}
                 price={item.price}
+                status={item.status}
                 onDelete={(id) => removeById(id)}
               />
             );

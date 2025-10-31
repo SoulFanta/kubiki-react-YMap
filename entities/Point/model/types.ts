@@ -8,5 +8,6 @@ export interface Point {
     color: string
     price: number
     createdAt: number
+    status: string
 }
 

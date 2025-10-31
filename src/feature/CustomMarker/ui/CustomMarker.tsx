@@ -19,7 +19,7 @@ export type CustomMarkerProps = {
   price?: number;
   category?: string;
   MapMarker: typeof YMapMarker;
-
+  status?: string;
   /** Доп. классы для корневого контейнера (необязательно) */
   className?: string;
   onDelete?: (id: string | number) => void;
@@ -93,6 +93,7 @@ export default class CustomMarker extends React.Component<
       category,
       MapMarker,
       className,
+      status
     } = this.props;
     const { hover, open, visible } = this.state;
 
@@ -141,7 +142,7 @@ export default class CustomMarker extends React.Component<
                 {"Тип: " + category}
               </div>
               <div className="text-md leading-snug pr-6">
-                {"Статус: В ожидании"}
+                {"Статус: " + status}
               </div>
               <div className="w-full flex justify-between">
                 <button
