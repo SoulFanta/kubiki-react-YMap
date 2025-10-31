@@ -13,6 +13,7 @@ import CustomMarker from "./feature/CustomMarker/ui/CustomMarker";
 import clsx from "clsx";
 import GpsPositionMy from "./feature/GpsPositionMy/GpsPositionMy";
 import { usePointsStore } from "./entities/Point/model/usePointsStore";
+import { api } from "./shared/api/client";
 
 function App() {
   const [location, setLocation] = useState<YMapLocationRequest>({
@@ -20,11 +21,12 @@ function App() {
     zoom: 9,
   });
 
-  const [category] = useState<string[]>(["Билборд", "Фасад"]);
+  const [category, setCategory] = useState<string[]>(["Билборд", "Фасад"]);
   const { items, isLoading, fetch, removeById } = usePointsStore();
   // Грузим данные один раз при монтировании
   useEffect(() => {
     fetch();
+    api.get("categories").then((items) => setCategory(items.data));
   }, [fetch]);
 
   const [isOpen, setOpen] = useState(false);
