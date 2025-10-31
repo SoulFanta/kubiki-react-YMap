@@ -21,12 +21,12 @@ function App() {
     zoom: 9,
   });
 
-  const [category, setCategory] = useState<string[]>(["Билборд", "Фасад"]);
+  const [category, setCategory] = useState<string[]>([]);
   const { items, isLoading, fetch, removeById } = usePointsStore();
   // Грузим данные один раз при монтировании
   useEffect(() => {
     fetch();
-    api.get("categories").then((items) => setCategory(items.data));
+    api.get("/MapPoints/categories").then((items) => setCategory(items.data));
   }, [fetch]);
 
   const [isOpen, setOpen] = useState(false);
