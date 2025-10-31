@@ -16,12 +16,13 @@ export type CustomMarkerProps = {
   description?: string;
   /** Цвет «точки» маркера (HEX/CSS) */
   color?: string;
-
+  price?: number;
+  category?: string;
   MapMarker: typeof YMapMarker;
 
   /** Доп. классы для корневого контейнера (необязательно) */
   className?: string;
-  onDelete?: (id: string | number) => void
+  onDelete?: (id: string | number) => void;
 };
 
 type CustomMarkerState = {
@@ -71,7 +72,7 @@ export default class CustomMarker extends React.Component<
 
     try {
       await api.delete(`/MapPoints/${encodeURIComponent(String(id))}`);
-      this.props.onDelete(id)
+      this.props.onDelete(id);
       this.setState({ visible: false, open: false });
     } catch (err) {
       console.error(err);
@@ -83,8 +84,14 @@ export default class CustomMarker extends React.Component<
   }
 
   render() {
-    const { coordinates, title, description, color, MapMarker, className } =
-      this.props;
+    const {
+      coordinates,
+      title,
+      description,
+      color,
+      MapMarker,
+      className,
+    } = this.props;
     const { hover, open, visible } = this.state;
 
     if (!visible) return null; // ← убираем из дерева вовсе
@@ -119,16 +126,24 @@ export default class CustomMarker extends React.Component<
 
           {open && (
             <div
-              className="absolute min-w-2xs min-h-2xs -bottom-8 left-1/2 flex justify-between flex-col -translate-x-1/2 z-10 bg-white text-neutral-900 rounded-sm shadow-xl px-3 py-2 max-w-3xs min-h-[100px]"
+              className="absolute min-w-xs p-3  min-h-2xs -bottom-8 left-1/2 flex justify-between flex-col -translate-x-1/2 z-10 bg-white border border-black/30 text-neutral-900 rounded-sm shadow-xl px-3 py-2 max-w-3xs min-h-[100px]"
               onClick={this.stop}
             >
-              <header><h3 className="text-xs">{title}</h3></header>
-              <div className="text-sm leading-snug pr-6">
-                {description ?? "Нет описания"}
+              <header>
+                <h3 className="text-lg">{title}</h3>
+              </header>
+              <div className="text-md leading-snug pr-6">
+                {"Описание: " + description}
+              </div>
+              <div className="text-md leading-snug pr-6">
+                {"Категория: " + description}
+              </div>
+              <div className="text-md leading-snug pr-6">
+                {"Статус: В ожидании"}
               </div>
               <div className="w-full justify-between">
                 <button
-                  className="text-sm text-neutral-500 hover:text-neutral-800"
+                  className="text-md text-neutral-500 cursor-pointer hover:text-neutral-800"
                   onClick={this.deleteMarker}
                   aria-label="Удалить"
                 >

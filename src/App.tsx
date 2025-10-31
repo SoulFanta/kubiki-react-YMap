@@ -20,7 +20,7 @@ function App() {
     zoom: 9,
   });
 
-  const [category] = useState<string[]>(["вывлав", "выв"]);
+  const [category] = useState<string[]>(["Билборд", "Фасад"]);
   const { items, isLoading, fetch, removeById } = usePointsStore();
   // Грузим данные один раз при монтировании
   useEffect(() => {
@@ -67,7 +67,7 @@ function App() {
                 <h2 className="  pb-2 ">Список точек</h2>
                 <select
                   name=""
-                  className="min-w-18 h-7 border  border-black/30 rounded-sm"
+                  className="min-w-30 h-7 border bg-white/70  border-black/30 rounded-sm"
                 >
                   {category.map((item) => {
                     return <option value={item}>{item}</option>;
