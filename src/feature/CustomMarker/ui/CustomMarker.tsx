@@ -89,6 +89,8 @@ export default class CustomMarker extends React.Component<
       title,
       description,
       color,
+      price,
+      category,
       MapMarker,
       className,
     } = this.props;
@@ -136,12 +138,12 @@ export default class CustomMarker extends React.Component<
                 {"Описание: " + description}
               </div>
               <div className="text-md leading-snug pr-6">
-                {"Категория: " + description}
+                {"Тип: " + category}
               </div>
               <div className="text-md leading-snug pr-6">
                 {"Статус: В ожидании"}
               </div>
-              <div className="w-full justify-between">
+              <div className="w-full flex justify-between">
                 <button
                   className="text-md text-neutral-500 cursor-pointer hover:text-neutral-800"
                   onClick={this.deleteMarker}
@@ -149,6 +151,9 @@ export default class CustomMarker extends React.Component<
                 >
                   Удалить
                 </button>
+                <p className="text-md  cursor-pointer text-neutral-800">
+                  {price} ₽
+                </p>
               </div>
               <button
                 className="absolute top-1.5 right-2 text-lg leading-none text-neutral-500 hover:text-neutral-800"
