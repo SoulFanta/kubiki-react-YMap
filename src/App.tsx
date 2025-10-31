@@ -7,10 +7,12 @@ import {
 } from "./shared/lib/ymaps";
 import type { YMapLocationRequest } from "ymaps3";
 import "./App.css";
+import { Menu } from "lucide-react";
 
 import CustomMarker from "./feature/CustomMarker/ui/CustomMarker";
-import { Point } from "../entities/Point/model/types";
-import { api } from "./shared/api/client";
+import clsx from "clsx";
+import GpsPositionMy from "./feature/GpsPositionMy/GpsPositionMy";
+import { usePointsStore } from "./entities/Point/model/usePointsStore";
 
 function App() {
   const [location, setLocation] = useState<YMapLocationRequest>({
@@ -18,38 +20,40 @@ function App() {
     zoom: 9,
   });
 
-  const [isLoading, setLoading] = useState(true);
-  const [items, setItems] = useState<Point[]>([]);
-
+  const [category] = useState<string[]>(["вывлав", "выв"]);
+  const { items, isLoading, fetch, removeById } = usePointsStore();
   // Грузим данные один раз при монтировании
   useEffect(() => {
-    let cancelled = false;
+    fetch();
+  }, [fetch]);
 
-    (async () => {
-      try {
-        setLoading(true);
-        const res = await api.get<Point[]>("/MapPoints"); // Axios: Promise<AxiosResponse<Point[]>>
-        if (!cancelled) setItems(res.data);
-      } catch (e) {
-        console.error(e);
-        if (!cancelled) setItems([]); // на ошибке — пустой список
-      } finally {
-        if (!cancelled) setLoading(false);
-      }
-    })();
-
-    return () => {
-      cancelled = true;
-    };
-  }, []);
+  const [isOpen, setOpen] = useState(false);
 
   return (
     <div className="w-screen h-screen">
+      <GpsPositionMy
+        onPosition={(pos) =>
+          setLocation((prev) => ({
+            ...prev,
+            center: [pos.coords.longitude, pos.coords.latitude] as [
+              number,
+              number
+            ],
+          }))
+        }
+      />
       <YMap location={location}>
         <YMapDefaultSchemeLayer />
         <YMapDefaultFeaturesLayer />
 
-        <nav className="w-[300px] bg-transparent backdrop-blur-sm border-r border-zinc-950/20 h-screen absolute z-20">
+        <nav
+          className={clsx(
+            "w-[300px] transition-all bg-transparent backdrop-blur-sm border-r border-zinc-950/20 h-screen absolute z-20",
+            {
+              "-translate-x-[300px]": isOpen,
+            }
+          )}
+        >
           {isLoading ? (
             <ul className="p-3 space-y-2">
               {/* skeleton-заглушки */}
@@ -59,19 +63,39 @@ function App() {
             </ul>
           ) : (
             <ul className="p-3 space-y-1">
-              <header>
-                <h2 className="select-none">Menu</h2>
+              <header className="border-black/30 border-b relative select-none gap-2 flex ">
+                <h2 className="  pb-2 ">Список точек</h2>
+                <select
+                  name=""
+                  className="min-w-18 h-7 border  border-black/30 rounded-sm"
+                >
+                  {category.map((item) => {
+                    return <option value={item}>{item}</option>;
+                  })}
+                </select>
+                <button
+                  className="bg-white/40 cursor-pointer absolute  right-2 -top-0.5 rounded-sm  border border-black/30 p-0.5"
+                  onClick={() => {
+                    setOpen(!isOpen);
+                  }}
+                >
+                  <Menu
+                    className={clsx(" transition-all ", {
+                      "translate-x-13": isOpen,
+                    })}
+                  />
+                </button>
               </header>
               {(items ?? []).map((item) => (
                 <li
-                  onClick={() => {
-                    setLocation({
-                      center: [item.longitude, item.latitude], // [lng, lat]
-                      zoom: 16,
-                    });
-                  }}
                   key={item.id}
-                  className=" select-none rounded-md px-3 py-2 overscroll-y-auto hover:bg-white/50 cursor-pointer flex items-center justify-between"
+                  onClick={() =>
+                    setLocation({
+                      center: [item.longitude, item.latitude],
+                      zoom: 16,
+                    })
+                  }
+                  className="select-none rounded-md px-3 py-2 hover:bg-white/50 cursor-pointer flex items-center justify-between"
                 >
                   <span className="text-sm font-medium">{item.title}</span>
                   {item.color && (
@@ -84,7 +108,7 @@ function App() {
                 </li>
               ))}
               {(!items || items.length === 0) && (
-                <li className="text-xs text-white/60 px-3 py-2">Нет точек</li>
+                <li className="text-sm text-black/60  px-3 py-2">Нет точек</li>
               )}
             </ul>
           )}
@@ -94,11 +118,13 @@ function App() {
           items.map((item) => {
             return (
               <CustomMarker
-                id={item.id}
+                key={item.id}
+                _id={item.id}
                 coordinates={[item.longitude, item.latitude]}
                 title={item.title}
                 description={item.description}
                 MapMarker={YMapMarker}
+                onDelete={(id) => removeById(id)}
               />
             );
           })}
